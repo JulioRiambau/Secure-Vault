@@ -18,3 +18,8 @@ Detected issue in Credentials.razor. To fix this situation, an InputSanitization
 The same approach was applied to Register.razor and Login.razor to ensure consistent input sanitization across the application.
 
 Added unit tests to verify that the InputSanitizationService correctly trims user input and handles edge cases. The tests cover various scenarios, including inputs with leading and trailing whitespace, empty strings, and null values.
+
+
+## Copilot AI Usage
+
+This app was entirelly generated using copilot AI. The code was reviewed and modified by AI to ensure security best practices were followed, including input sanitization and protection against SQL injection and XSS vulnerabilities.
