@@ -1,0 +1,49 @@
+﻿@page "/"
+
+<PageTitle>Home - SecureVault</PageTitle>
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h1 class="display-4">🔒 Welcome to SecureVault</h1>
+        <p class="lead">Your secure credential storage solution</p>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3>🔐 Encrypted Storage</h3>
+                    <p>All your passwords are encrypted using AES-256 encryption</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3>👤 Personal & Secure</h3>
+                    <p>Role-based access control ensures you only see your own credentials</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3>🚀 Easy to Use</h3>
+                    <p>Simple interface to store, view, and manage your credentials</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <AuthorizeView>
+            <Authorized>
+                <a href="/credentials" class="btn btn-primary btn-lg">View My Credentials</a>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/register" class="btn btn-primary btn-lg me-2">Get Started</a>
+                <a href="/login" class="btn btn-outline-secondary btn-lg">Login</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</div>

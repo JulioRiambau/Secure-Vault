@@ -1,0 +1,123 @@
+@page "/register"
+@using Microsoft.AspNetCore.Identity
+@using SecureVault.Data.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Register - SecureVault</PageTitle>
+
+<div class="container" style="max-width: 400px; margin-top: 50px;">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4">Create Account</h3>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @errorMessage
+                </div>
+            }
+
+            <EditForm Model="registerModel" OnValidSubmit="HandleRegister" FormName="registerForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <InputText id="email" @bind-Value="registerModel.Email" class="form-control" placeholder="email@example.com" />
+                    <ValidationMessage For="() => registerModel.Email" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <InputText id="password" type="password" @bind-Value="registerModel.Password" class="form-control" />
+                    <ValidationMessage For="() => registerModel.Password" />
+                    <small class="form-text text-muted">
+                        Password must be at least 6 characters and contain uppercase, lowercase, and a digit.
+                    </small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <InputText id="confirmPassword" type="password" @bind-Value="registerModel.ConfirmPassword" class="form-control" />
+                    <ValidationMessage For="() => registerModel.ConfirmPassword" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" disabled="@isProcessing">
+                    @if (isProcessing)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Creating account...</span>
+                    }
+                    else
+                    {
+                        <span>Register</span>
+                    }
+                </button>
+            </EditForm>
+
+            <div class="text-center mt-3">
+                <p>Already have an account? <a href="/login">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterModel registerModel = new();
+    private string? errorMessage;
+    private bool isProcessing;
+
+    private async Task HandleRegister()
+    {
+        isProcessing = true;
+        errorMessage = null;
+
+        try
+        {
+            var user = new ApplicationUser 
+            { 
+                UserName = registerModel.Email,
+                Email = registerModel.Email 
+            };
+
+            var result = await UserManager.CreateAsync(user, registerModel.Password);
+
+            if (result.Succeeded)
+            {
+                Navigation.NavigateTo("/login?registered=true", forceLoad: true);
+            }
+            else
+            {
+                errorMessage = string.Join(" ", result.Errors.Select(e => e.Description));
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private class RegisterModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}

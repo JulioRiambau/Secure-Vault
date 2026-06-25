@@ -1,0 +1,25 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Publish output
+publish/
+
+# Logs
+*.log
+SecureVault/logs/
+
+# Local database files
+SecureVault/securevault.db
+SecureVault/securevault.db-shm
+SecureVault/securevault.db-wal
+
+# ASP.NET Core / Blazor secrets and local config
+SecureVault/appsettings*.json
