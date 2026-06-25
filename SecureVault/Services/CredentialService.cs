@@ -8,15 +8,18 @@ public class CredentialService
 {
     private readonly SecureVaultDbContext _context;
     private readonly EncryptionService _encryptionService;
+    private readonly InputSanitizationService _sanitizationService;
     private readonly ILogger<CredentialService> _logger;
 
     public CredentialService(
         SecureVaultDbContext context,
         EncryptionService encryptionService,
+        InputSanitizationService sanitizationService,
         ILogger<CredentialService> logger)
     {
         _context = context;
         _encryptionService = encryptionService;
+        _sanitizationService = sanitizationService;
         _logger = logger;
     }
 
@@ -55,13 +58,19 @@ public class CredentialService
     {
         try
         {
+            // Sanitize inputs to prevent XSS and injection attacks
+            var sanitizedServiceName = _sanitizationService.SanitizeAndValidate(serviceName);
+            var sanitizedUsername = _sanitizationService.SanitizeAndValidate(username);
+            var sanitizedPassword = _sanitizationService.Trim(password); // Don't HTML encode passwords
+            var sanitizedComment = string.IsNullOrEmpty(comment) ? null : _sanitizationService.SanitizeAndValidate(comment);
+
             var credential = new StoredCredential
             {
                 UserId = userId,
-                ServiceName = serviceName,
-                Username = username,
-                EncryptedPassword = _encryptionService.Encrypt(password),
-                Comment = comment,
+                ServiceName = sanitizedServiceName,
+                Username = sanitizedUsername,
+                EncryptedPassword = _encryptionService.Encrypt(sanitizedPassword),
+                Comment = sanitizedComment,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -87,15 +96,17 @@ public class CredentialService
             if (credential == null)
                 return false;
 
-            credential.ServiceName = serviceName;
-            credential.Username = username;
+            // Sanitize inputs to prevent XSS and injection attacks
+            credential.ServiceName = _sanitizationService.SanitizeAndValidate(serviceName);
+            credential.Username = _sanitizationService.SanitizeAndValidate(username);
 
             if (!string.IsNullOrEmpty(password))
             {
-                credential.EncryptedPassword = _encryptionService.Encrypt(password);
+                var sanitizedPassword = _sanitizationService.Trim(password); // Don't HTML encode passwords
+                credential.EncryptedPassword = _encryptionService.Encrypt(sanitizedPassword);
             }
 
-            credential.Comment = comment;
+            credential.Comment = string.IsNullOrEmpty(comment) ? null : _sanitizationService.SanitizeAndValidate(comment);
             credential.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

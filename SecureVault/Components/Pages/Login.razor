@@ -2,7 +2,9 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Identity
 @using SecureVault.Data.Models
+@using SecureVault.Services
 @inject SignInManager<ApplicationUser> SignInManager
+@inject InputSanitizationService SanitizationService
 @inject NavigationManager Navigation
 
 
@@ -26,7 +28,7 @@
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <InputText id="email" @bind-Value="loginModel.Email" class="form-control" placeholder="email@example.com" />
+                    <InputText id="email" @bind-Value="loginModel.Email" @onfocusout="() => loginModel.Email = SanitizationService.Trim(loginModel.Email)" class="form-control" placeholder="email@example.com" />
                     <ValidationMessage For="() => loginModel.Email" />
                 </div>
 

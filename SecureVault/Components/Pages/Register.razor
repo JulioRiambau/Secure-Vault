@@ -1,8 +1,11 @@
 @page "/register"
 @using Microsoft.AspNetCore.Identity
 @using SecureVault.Data.Models
+@using SecureVault.Services
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+@inject InputSanitizationService SanitizationService
+@inject ILogger<Register> Logger
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
@@ -26,7 +29,7 @@
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <InputText id="email" @bind-Value="registerModel.Email" class="form-control" placeholder="email@example.com" />
+                    <InputText id="email" @bind-Value="registerModel.Email" @onfocusout="() => registerModel.Email = SanitizationService.Trim(registerModel.Email)" class="form-control" placeholder="email@example.com" />
                     <ValidationMessage For="() => registerModel.Email" />
                 </div>
 
@@ -96,7 +99,8 @@
         }
         catch (Exception ex)
         {
-            errorMessage = $"An error occurred: {ex.Message}";
+            Logger.LogError(ex, "Registration failed");
+            errorMessage = "An error occurred during registration. Please try again later.";
         }
         finally
         {

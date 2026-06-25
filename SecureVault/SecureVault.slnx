@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="../SecureVault.Tests/SecureVault.Tests.csproj">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
   <Project Path="SecureVault.csproj" />
 </Solution>
